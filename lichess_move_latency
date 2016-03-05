@@ -1,0 +1,27 @@
+#!/usr/bin/env php
+<?php
+
+if(isset($argv[1]) && 'config' == $argv[1]) {
+  echo "graph_title Lichess move latency
+graph_args --base 1000 --lower-limit 0 --upper-limit 100 --rigid
+graph_vlabel move latency
+graph_category lichess
+mlat.label move latency
+mlat.draw LINE
+";
+  exit;
+}
+
+$url = 'http://en.lichess.org/monitor/status/moveLatency';
+
+$curl = curl_init();
+curl_setopt_array($curl, array(
+      CURLOPT_URL             => $url,
+      CURLOPT_PORT            => 80,
+      CURLOPT_USERAGENT       => 'munin',
+      CURLOPT_RETURNTRANSFER  => true,
+      CURLOPT_TIMEOUT         => 2
+    ));
+$moves = curl_exec($curl);
+
+echo "mlat.value ".$moves."\n";
