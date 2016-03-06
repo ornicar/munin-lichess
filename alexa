@@ -1,0 +1,38 @@
+#!/usr/bin/env php
+<?php
+
+$sites = array(
+    "chessbomb.com",
+    "lichess.org",
+    "chess24.com",
+    "chesscube.com",
+    "gameknot.com",
+    "itsyourturn.com",
+    "sparkchess.com",
+    "chessbase.com",
+    "chesstempo.com",
+    "chess.com");
+
+function safe($name) {
+    return str_replace('.', '_', $name);
+}
+
+if(isset($argv[1]) && 'config' == $argv[1]) {
+    echo "graph_title Alexa rankings\n";
+    echo "graph_args --base 1000 --logarithmic\n";
+    echo "graph_vlabel ranking\n";
+    echo "graph_category lichess\n";
+    foreach ($sites as $site) {
+        echo safe($site) . ".label $site\n";
+        echo safe($site) . ".draw LINE\n";
+    }
+    exit;
+}
+
+$chess_links = file_get_contents("http://chess-links.org/index.html");
+
+foreach ($sites as $site) {
+    preg_match("/($site).+?<td>([0-9]+)<\/td>/", $chess_links, $val);
+    print_r(safe($site) . ".value ".$val[2]."\n");
+}
+
